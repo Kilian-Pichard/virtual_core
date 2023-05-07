@@ -77,17 +77,17 @@ def get_register_value(register_string):
         return R8
     elif register_string == "r9":
         return R9
-    elif register_string == "r9":
+    elif register_string == "r10":
         return R10
-    elif register_string == "r9":
+    elif register_string == "r11":
         return R11
-    elif register_string == "r9":
+    elif register_string == "r12":
         return R12
-    elif register_string == "r9":
+    elif register_string == "r13":
         return R13
-    elif register_string == "r9":
+    elif register_string == "r14":
         return R14
-    elif register_string == "r9":
+    elif register_string == "r15":
         return R15
 
 
