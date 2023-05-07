@@ -404,14 +404,10 @@ void execute(int is_verbose) {
                 BCC_BG = (OPE1 > OPE2) ? 1 : 0;
                 break;
             case SUB:
-                result = OPE1 - OPE2;
-                carry = (result >> 63) & 1;
-                regs[DEST] = result & 0xFFFFFFFFFFFFFFFF;
+                regs[DEST] = OPE1 - OPE2;
                 break;
             case SBC:
-                result = OPE1 - OPE2 + carry - 1;
-                carry = (result >> 63) & 1;
-                regs[DEST] = result & 0xFFFFFFFFFFFFFFFF;
+                regs[DEST] = OPE1 - OPE2 + carry - 1;
                 break;
             case MOV:
                 regs[DEST] = OPE2;

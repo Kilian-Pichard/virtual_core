@@ -2,3 +2,4 @@
 main
 
 /venv
+/cmake-build-debug/
