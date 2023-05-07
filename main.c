@@ -38,7 +38,5 @@ int main(int argc, char **argv) {
     // Fetch instructions and close file
     loop_program(binary_file, is_verbose);
 
-    print_registers();
-
     fclose(binary_file);
 }

@@ -244,6 +244,9 @@ void loop_program(FILE *file, int is_verbose) {
         decode(instruction, is_verbose);
         execute(is_verbose);
     }
+
+    if (!is_verbose) print_registers();
+
     if (program_counter < 0 ) {
         printf("\nError: program counter out of bounds.\n");
         exit(EXIT_FAILURE);
