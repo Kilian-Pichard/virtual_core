@@ -22,4 +22,5 @@ MOV r3, 0
 ADD r5, r5, 1
 
 B -14
-MOV r15, 0
+MOV r5, 0
+MOV r6, 0
