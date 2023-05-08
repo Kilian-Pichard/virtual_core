@@ -54,7 +54,7 @@ void decode(uint32_t instruction, int is_verbose);
 void execute(int is_verbose);
 
 void print_registers() {
-    printf("Printing registers...\n");
+    //printf("Printing registers...\n");
     for(int i=0 ; i<16 ; i++) {
         printf("%s = 0x%llx\n", registers[i], regs[i]);
     }
@@ -390,12 +390,12 @@ void execute(int is_verbose) {
                 break;
             case ADD:
                 result = OPE1 + OPE2;
-                carry = (result >> 63) & 1;
+                carry = (result < OPE1 || result < OPE2) ? 1 : 0;
                 regs[DEST] = result & 0xFFFFFFFFFFFFFFFF;
                 break;
             case ADC:
                 result = OPE1 + OPE2 + carry;
-                carry = (result >> 63) & 1;
+                carry = (result < OPE1 || result < OPE2) ? 1 : 0;
                 regs[DEST] = result & 0xFFFFFFFFFFFFFFFF;
                 break;
             case CMP:
