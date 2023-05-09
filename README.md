@@ -15,6 +15,7 @@ This project involves implementing a 64-bit executable file on a Debian 11 distr
 1. Run `make` or `make run` command to build and run the program. This will prompt you to select a program to run from a list of available programs. You can also choose to run the program in verbose mode. 
 2. Run `make doc` command to generate documentation using Doxygen. This will generate documentation in the ./doc folder. 
 3. Run `make clean` command to clean up generated binaries and documentation.
+4. Run `make test` command to run the unit tests.
 
 If you want to compile and/or run a file by your own, you can use the following commands:
  - Compile: `python3 compiler.py <assembly_file.s>`
