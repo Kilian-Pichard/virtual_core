@@ -2,6 +2,13 @@
 #include <stdlib.h>
 #include "functions.c"
 
+/**
+ * @brief Main function
+ * @param argc
+ * @param argv
+ * @return int
+ * @author Kilian Pichard
+ */
 int main(int argc, char **argv) {
     // Usage example : BIN_NAME <CODE> <STATE> (VERBOSE)
     // Example: ./main compiled.bin reginit.txt
@@ -37,6 +44,5 @@ int main(int argc, char **argv) {
 
     // Fetch instructions and close file
     loop_program(binary_file, is_verbose);
-
     fclose(binary_file);
 }

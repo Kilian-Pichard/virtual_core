@@ -1,7 +1,6 @@
 # In order to see the compiled.bin file on the terminal, use this command:
 # - in binary format: $ xxd -b compiled.bin
 # - in hex format: $ hexdump -C compiled.bin
-# If offset of BCC is positive, bit 27 is equal to 0, otherwise it's equal to 1
 
 import sys
 import os
