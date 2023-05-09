@@ -1,6 +1,7 @@
 CC = gcc
 PYTHON = python3
 COMPILER = compiler.py
+TEST = tests/test.py
 MAIN = main.c
 PROGRAMS = $(wildcard programs/*.s)
 DOXYFILE = Doxyfile
@@ -20,6 +21,9 @@ run:
 	$(CC) -o main $(MAIN) && \
 	if [[ -n $${verbose} ]]; then ./main programs/$${program}_test.bin programs/$${program}_state.txt $${verbose}; else ./main programs/$${program}_test.bin programs/$${program}_state.txt; fi
 
+test:
+	$(PYTHON) $(TEST)
+
 doc:
 	doxygen documentation/$(DOXYFILE)
 	@echo "Documentation generated in ./doc folder"
@@ -30,4 +34,5 @@ clean:
 	@for file in ./programs/*.bin; do if test -f $$file; then rm $$file; fi; done
 	@if test -f ./*.bin; then rm ./*.bin; fi
 	@if test -f main; then rm main; fi
-	@echo "Doc and binaries removed"
+	@if test -f test/*.log; then rm test/*.log; fi
+	@echo "Doc binaries and logs removed"
