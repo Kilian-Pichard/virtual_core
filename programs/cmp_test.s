@@ -1,0 +1,7 @@
+MOV r0, 1
+MOV r1, 2
+CMP r0, r1
+BG 3
+MOV r2, 175
+B 2
+MOV r2, 254
