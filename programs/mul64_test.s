@@ -2,15 +2,16 @@ MOV r4, 32
 MOV r5, 32
 
 MOV r2, r0
+MOV r15, r0
 RSH r2, r2, 32
-LSH r0, r0, 32
-RSH r0, r0, 32
+LSH r15, r15, 32
+RSH r15, r15, 32
 MOV r3, r1
 RSH r3, r3, 32
 LSH r1, r1, 32
 RSH r1, r1, 32
 
-MOV r10, r0
+MOV r10, r15
 MOV r11, r1
 MOV r12, r2
 MOV r13, r3
@@ -25,7 +26,7 @@ RSH r11, r11, 1
 SUB r4, r4, 1
 B -9
 
-MOV r10, r0
+MOV r10, r15
 MOV r11, r1
 MOV r12, r2
 MOV r13, r3
@@ -40,7 +41,7 @@ RSH r11, r11, 1
 SUB r5, r5, 1
 B -9
 
-MOV r10, r0
+MOV r10, r15
 MOV r11, r1
 MOV r12, r2
 MOV r13, r3
@@ -55,7 +56,7 @@ RSH r13, r13, 1
 SUB r6, r6, 1
 B -9
 
-MOV r10, r0
+MOV r10, r15
 MOV r11, r1
 MOV r12, r2
 MOV r13, r3
