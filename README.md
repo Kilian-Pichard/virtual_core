@@ -35,4 +35,4 @@ Please refer to the **documentation** folder for more information about the proj
 
 ## License
 
-This project is licensed under the MIT License - see the **LICENSE** file for details.
+This project is licensed under the MIT License - see the **[LICENSE](https://github.com/Kilian-Pichard/virtual_core/blob/main/LICENSE)** file for details.

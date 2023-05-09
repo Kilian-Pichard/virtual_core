@@ -32,4 +32,4 @@ The compiler is divided into multiple functions:
 
 ## License
 
-This compiler is licensed under the MIT License - see the **LICENSE** file for details.
+This project is licensed under the MIT License - see the **[LICENSE](https://github.com/Kilian-Pichard/virtual_core/blob/main/LICENSE)** file for details.
