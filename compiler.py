@@ -1,11 +1,14 @@
 # In order to see the compiled.bin file on the terminal, use this command:
-# in binary format: $ xxd -b compiled.bin
-# in hex format: $ hexdump -C compiled.bin
-# if offset of BCC is positive, bit 27 is equal to 0, otherwise it's equal to 1
+# - in binary format: $ xxd -b compiled.bin
+# - in hex format: $ hexdump -C compiled.bin
+# If offset of BCC is positive, bit 27 is equal to 0, otherwise it's equal to 1
 
 import sys
 import os
 
+EXIT_ERROR = -1
+
+# Registers values
 R0 = b'\x00'    # 0x00
 R1 = b'\x01'    # 0x01
 R2 = b'\x02'    # 0x02
@@ -48,14 +51,17 @@ RSH = b'\xa0'           # 0xa0
 OPCODE_NULL = b'\x00'   # 0xf0
 
 
+# Proceed a left shift of shift bits on input
 def left_shift(input, shift):
     return ((int.from_bytes(input, byteorder="big")) << shift).to_bytes(1, byteorder='big')
 
 
+# Proceed a bitwise OR between input1 and input2
 def bitwise_or(input1, input2):
     return (int.from_bytes(input1, byteorder="big") | int.from_bytes(input2, byteorder="big")).to_bytes(1, byteorder="big")
 
 
+# Get the register value
 def get_register_value(register_string):
     if register_string == "r0":
         return R0
@@ -91,15 +97,17 @@ def get_register_value(register_string):
         return R15
 
 
+# Main function: encode an instruction
 def encode_instruction(instruction, instruction_args):
-    BCC = BCC_NULL  # 4 bits
-    OFFSET_IV_FLAG = b'\x00' # 3 bits 0
-    OPCODE = OPCODE_NULL  # 4 bits
-    FIRST_OPERAND = b'\x00' # 4 bits
-    SECOND_OPERAND = b'\x00'  # 4 bits
-    DEST = b'\x00'  # 4 bits
-    IV = b'\x00'  # 8 bits
-    if instruction.startswith("B"):  # BCC
+    BCC = BCC_NULL              # 4 bits
+    OFFSET_IV_FLAG = b'\x00'    # 4 bits (3 bits offset + 1 bit IV flag)
+    OPCODE = OPCODE_NULL        # 4 bits
+    FIRST_OPERAND = b'\x00'     # 4 bits
+    SECOND_OPERAND = b'\x00'    # 4 bits
+    DEST = b'\x00'              # 4 bits
+    IV = b'\x00'                # 8 bits
+
+    if instruction.startswith("B"):  # Check if instruction is a BCC
         if instruction == "B":
             BCC = B
         elif instruction == "BEQ":
@@ -114,7 +122,7 @@ def encode_instruction(instruction, instruction_args):
             BCC = BL
         elif instruction == "BG":
             BCC = BG
-        if -255 <= int(instruction_args[0]) <= 255:
+        if -255 <= int(instruction_args[0]) <= 255:  # Check if offset is a digit on 2 bytes, positive or negative
             if int(instruction_args[0]) < 0:
                 IV = abs(int(instruction_args[0])).to_bytes(1, byteorder="big", signed=False)
                 OFFSET_IV_FLAG = b'\x08'
@@ -122,12 +130,12 @@ def encode_instruction(instruction, instruction_args):
                 IV = int(instruction_args[0]).to_bytes(1, byteorder="big", signed=False)
         else:
             print("Error! Please use digit on 2 bytes (from -255 to 255).")
-            exit(-1)
-    else:
-        registers = list(filter(lambda x:x.startswith("r"), instruction_args))
-        if len(registers) > 1:
+            exit(EXIT_ERROR)
+    else:  # If instruction is not a BCC
+        registers = list(filter(lambda x:x.startswith("r"), instruction_args))  # Get all registers of the instruction
+        if len(registers) > 1:  # If there is at least 2 registers
             FIRST_OPERAND = get_register_value(registers[1])
-        if len(registers) > 2:
+        if len(registers) > 2:  # If there is at least 3 registers
             SECOND_OPERAND = left_shift(get_register_value(registers[2]), 4)
         if instruction == "AND":
             OPCODE = AND
@@ -146,9 +154,9 @@ def encode_instruction(instruction, instruction_args):
             DEST = get_register_value(registers[0])
         elif instruction == "CMP":
             OPCODE = CMP
-            if len(registers) > 0:
+            if len(registers) > 0:  # If there is at least 1 register
                 FIRST_OPERAND = get_register_value(registers[0])
-            if len(registers) > 1:
+            if len(registers) > 1:  # If there is at least 2 registers
                 SECOND_OPERAND = left_shift(get_register_value(registers[1]), 4)
         elif instruction == "SUB":
             OPCODE = SUB
@@ -167,52 +175,46 @@ def encode_instruction(instruction, instruction_args):
         elif instruction == "RSH":
             OPCODE = RSH
             DEST = get_register_value(registers[0])
-        immediate_value = list(filter(lambda x:x.isdigit(), instruction_args))
-        if immediate_value:
+        immediate_value = list(filter(lambda x:x.isdigit(), instruction_args))  # Get immediate value of the instruction
+        if immediate_value:  # Check if immediate value is not empty
             if int(immediate_value[0]) <= 255:
                 IV = int(immediate_value[0]).to_bytes(1, byteorder="big", signed=False)
             else:
                 print("Error! Please use digit on 2 bytes (max 255).")
-                exit(-1)
+                exit(EXIT_ERROR)
     if instruction_args[-1].isdigit() and not instruction.startswith("B"):  # IV is not empty
         IV_FLAG = b'\x01'
         OFFSET_IV_FLAG = bytes([OFFSET_IV_FLAG[0] + IV_FLAG[0]])
-    # print(bitwise_or(left_shift(BCC, 4), OFFSET_IV_FLAG) + bitwise_or(OPCODE, FIRST_OPERAND) + bitwise_or(SECOND_OPERAND, DEST) + IV)
     return bitwise_or(left_shift(BCC, 4), OFFSET_IV_FLAG) + bitwise_or(OPCODE, FIRST_OPERAND) + bitwise_or(SECOND_OPERAND, DEST) + IV
 
-# Example:
-#  B 25              -> 1000 0000 0000 0000 0000 0000 0001 1001 -> 80 00 00 19
-#  B -3              -> 1000 1000 0000 0000 0000 0000 0000 0011 -> 88 00 00 03
-#  ADD r1, r2, 4     -> 0000 0001 0011 0010 0000 0001 0000 0100 -> 01 32 01 04
-#  ADD r1, r2, r4    -> 0000 0000 0011 0010 0100 0001 0000 0000 -> 00 32 41 00
-#  CMP r2, 5         -> 0000 0001 0101 0010 0000 0000 0000 0101 -> 01 52 00 05
-#  CMP r2, r5        -> 0000 0000 0101 0010 0101 0000 0000 0000 -> 00 52 50 00
 
 def main():
     if len(sys.argv) < 2 or not sys.argv[1].endswith(".s"):
         print("Error! Missing argument or invalid file extension.")
         print("Usage: python3 compiler.py <ASM.s>")
-        exit(-1)
+        exit(EXIT_ERROR)
     else:
         asm_file = sys.argv[1]
 
     if not os.path.isfile(asm_file):
         print("Error! File " + asm_file + " does not exist.")
         print("Usage: python3 compiler.py <ASM.s>")
-        exit(-1)
+        exit(EXIT_ERROR)
 
     with open(asm_file, "r") as f:
         lines = f.readlines()
 
     encoded = b''
-    for line in lines:
+    available_instructions = ["AND", "ORR", "EOR", "ADD", "ADC", "CMP", "SUB", "SBC", "MOV", "LSH", "RSH",
+                              "B", "BEQ", "BNE", "BLE", "BGE", "BL", "BG"]
+    for line in lines:  # Loop line by line in the read file in order to encode each instruction
         line_splited = line.strip().replace(",", "").split(" ")
         instruction = line_splited[0]
         instruction_args = line_splited[1:]
-        if instruction == "":
-            continue
-        encoded = encoded + encode_instruction(instruction, instruction_args)
+        if instruction in available_instructions:  # Check if instruction is available
+            encoded = encoded + encode_instruction(instruction, instruction_args)
 
+    # Write the encoded instructions in a binary file
     with open(os.path.splitext(asm_file)[0]+".bin", "wb+") as compiled_file:
         for byte in encoded:
             compiled_file.write(byte.to_bytes(1, byteorder='big'))
